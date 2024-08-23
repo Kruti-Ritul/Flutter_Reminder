@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 
 class Reminder extends StatelessWidget {
-  const Reminder({super.key, required this.taskName});
+  const Reminder(
+      {super.key,
+      required this.taskName,
+      required this.taskCompleted,
+      this.onChanged});
 
   final String taskName;
+  final bool taskCompleted;
+  final Function(bool?)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -24,11 +30,21 @@ class Reminder extends StatelessWidget {
         ),
         child: Row(
           children: [
+            Checkbox(
+              value: taskCompleted,
+              onChanged: onChanged,
+              checkColor: Colors.black,
+              activeColor: Colors.limeAccent[100],
+              side: BorderSide(color: Colors.black),
+            ),
             Text(
               taskName,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Ariel',
                 fontSize: 18,
+                decoration: taskCompleted
+                    ? TextDecoration.lineThrough
+                    : TextDecoration.none,
               ),
             ),
           ],
