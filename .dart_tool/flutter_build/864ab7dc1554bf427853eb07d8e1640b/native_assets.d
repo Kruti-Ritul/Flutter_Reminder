@@ -1,0 +1,1 @@
+ R:\\FlutterProjects\\myreminder\\.dart_tool\\flutter_build\\864ab7dc1554bf427853eb07d8e1640b\\native_assets.yaml: 
