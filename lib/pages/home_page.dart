@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myreminder/utils/dialog_box.dart';
 import 'package:myreminder/utils/reminder.dart';
 
 class HomePage extends StatefulWidget {
@@ -22,11 +23,13 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void saveNewReminder() {
-    setState(() {
-      reminderList.add([_controller.text, false]);
-      _controller.clear();
-    });
+  void createNewReminder() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return DialogBox();
+      },
+    );
   }
 
   void deleteReminder(int index) {
@@ -55,43 +58,9 @@ class _HomePageState extends State<HomePage> {
           );
         },
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Row(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                ),
-                child: TextField(
-                  controller: _controller,
-                  decoration: InputDecoration(
-                    hintText: 'Add a New Reminder!',
-                    filled: true,
-                    fillColor: Colors.grey.shade200,
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(
-                        color: Colors.black,
-                      ),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(
-                        color: Colors.black,
-                      ),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            FloatingActionButton(
-              onPressed: saveNewReminder,
-              child: const Icon(Icons.add),
-            ),
-          ],
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: createNewReminder,
+        child: const Icon(Icons.add),
       ),
     );
   }
