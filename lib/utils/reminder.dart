@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 class Reminder extends StatelessWidget {
-  const Reminder(
-      {super.key,
-      required this.taskName,
-      required this.taskCompleted,
-      required this.onChanged,
-      required this.deleteFunction});
+  const Reminder({
+    super.key,
+    required this.taskName,
+    required this.taskTime,
+    required this.taskCompleted,
+    required this.onChanged,
+    required this.deleteFunction,
+  });
 
   final String taskName;
+  final String taskTime;
   final bool taskCompleted;
   final Function(bool?)? onChanged;
   final Function(BuildContext)? deleteFunction;
@@ -25,7 +28,7 @@ class Reminder extends StatelessWidget {
       ),
       child: Slidable(
         endActionPane: ActionPane(
-          motion: StretchMotion(),
+          motion: const StretchMotion(),
           children: [
             SlidableAction(
               onPressed: deleteFunction,
@@ -36,29 +39,45 @@ class Reminder extends StatelessWidget {
         ),
         child: Container(
           width: 350.0,
-          height: 80.0,
+          height: 113.0,
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: Colors.blueAccent[100],
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Checkbox(
-                value: taskCompleted,
-                onChanged: onChanged,
-                checkColor: Colors.black,
-                activeColor: Colors.limeAccent[100],
-                side: BorderSide(color: Colors.black),
+              Row(
+                children: [
+                  Checkbox(
+                    value: taskCompleted,
+                    onChanged: onChanged,
+                    checkColor: Colors.black,
+                    activeColor: Colors.limeAccent[100],
+                    side: const BorderSide(color: Colors.black),
+                  ),
+                  Expanded(
+                    child: Text(
+                      taskName,
+                      style: TextStyle(
+                        fontFamily: 'Ariel',
+                        fontSize: 18,
+                        decoration: taskCompleted
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none,
+                      ),
+                    ),
+                  ),
+                ],
               ),
+              SizedBox(height: 5),
               Text(
-                taskName,
+                taskTime,
                 style: TextStyle(
                   fontFamily: 'Ariel',
-                  fontSize: 18,
-                  decoration: taskCompleted
-                      ? TextDecoration.lineThrough
-                      : TextDecoration.none,
+                  fontSize: 14,
+                  color: Colors.black54,
                 ),
               ),
             ],
