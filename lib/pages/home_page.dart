@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:myreminder/data/database.dart';
 import 'package:myreminder/utils/dialog_box.dart';
 import 'package:myreminder/utils/reminder.dart';
 
@@ -10,17 +12,31 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  //reference the hive box
+  final _myBox = Hive.box('mybox');
+  ReminderDataBase db = ReminderDataBase();
+
+  @override
+  void initState() {
+    // if App is opened for 1st time ever,default data is created
+    if (_myBox.get("ReminderList") == null) {
+      db.createInitialData();
+    } else {
+      //id user has already used the app and created some data
+      db.loadData();
+    }
+    super.initState();
+  }
+
+  //text controller
   final _controller = TextEditingController();
 
-  List reminderList = [
-    ['Learn Flutter', '10:30 AM', false],
-    ['Drink Water!', '3:15 PM', false],
-  ];
-
+  //check box checked
   void checkBoxChanged(int index, bool? value) {
     setState(() {
-      reminderList[index][2] = value ?? false;
+      db.reminderList[index][2] = value ?? false;
     });
+    db.updateDataBase();
   }
 
   String formatTimeOfDay(TimeOfDay time) {
@@ -35,7 +51,7 @@ class _HomePageState extends State<HomePage> {
   void addReminder(String task, TimeOfDay time) {
     setState(() {
       String formattedTime = formatTimeOfDay(time);
-      reminderList.add([task, formattedTime, false]);
+      db.reminderList.add([task, formattedTime, false]);
     });
   }
 
@@ -50,12 +66,14 @@ class _HomePageState extends State<HomePage> {
         );
       },
     );
+    db.updateDataBase();
   }
 
   void deleteReminder(int index) {
     setState(() {
-      reminderList.removeAt(index);
+      db.reminderList.removeAt(index);
     });
+    db.updateDataBase();
   }
 
   @override
@@ -72,12 +90,12 @@ class _HomePageState extends State<HomePage> {
           Expanded(
             // Allow ListView to take up remaining space
             child: ListView.builder(
-              itemCount: reminderList.length,
+              itemCount: db.reminderList.length,
               itemBuilder: (BuildContext context, index) {
                 return Reminder(
-                  taskName: reminderList[index][0],
-                  taskTime: reminderList[index][1],
-                  taskCompleted: reminderList[index][2],
+                  taskName: db.reminderList[index][0],
+                  taskTime: db.reminderList[index][1],
+                  taskCompleted: db.reminderList[index][2],
                   onChanged: (value) => checkBoxChanged(index, value),
                   deleteFunction: (context) => deleteReminder(index),
                 );
