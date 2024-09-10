@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:myreminder/pages/home_page.dart';
+import 'package:myreminder/utils/notifications.dart';
 
 void main() async {
-  //init the hive
-  await Hive.initFlutter();
+  WidgetsFlutterBinding.ensureInitialized();
 
-  //open a box
-  var box = await Hive.openBox('mybox');
+  // Initialize Hive
+  await Hive.initFlutter();
+  await Hive.openBox('mybox');
+
+  // Initialize notifications
+  await Notifications.initialize();
 
   runApp(const MyApp());
+
+  //Notifications.showNotification(id: id, title: title, body: body)
 }
 
 class MyApp extends StatelessWidget {
@@ -17,7 +24,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: HomePage(),
     );

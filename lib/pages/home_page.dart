@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:myreminder/data/database.dart';
 import 'package:myreminder/utils/dialog_box.dart';
+import 'package:myreminder/utils/notifications.dart';
 import 'package:myreminder/utils/reminder.dart';
 
 class HomePage extends StatefulWidget {
@@ -12,26 +13,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  //reference the hive box
   final _myBox = Hive.box('mybox');
   ReminderDataBase db = ReminderDataBase();
 
   @override
   void initState() {
-    // if App is opened for 1st time ever,default data is created
+    super.initState();
     if (_myBox.get("ReminderList") == null) {
       db.createInitialData();
     } else {
-      //id user has already used the app and created some data
       db.loadData();
     }
-    super.initState();
   }
 
-  //text controller
-  final _controller = TextEditingController();
-
-  //check box checked
   void checkBoxChanged(int index, bool? value) {
     setState(() {
       db.reminderList[index][2] = value ?? false;
@@ -52,7 +46,24 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       String formattedTime = formatTimeOfDay(time);
       db.reminderList.add([task, formattedTime, false]);
+
+      final now = DateTime.now();
+      final scheduledTime =
+          DateTime(now.year, now.month, now.day, time.hour, time.minute);
+
+      // Adjust notification scheduling based on whether the time is today or tomorrow
+      final notificationTime = scheduledTime.isBefore(now)
+          ? scheduledTime.add(const Duration(days: 1))
+          : scheduledTime;
+
+      Notifications.scheduleNotification(
+        id: db.reminderList.length,
+        title: task,
+        body: 'Reminder to: $task',
+        scheduledTime: notificationTime,
+      );
     });
+    db.updateDataBase();
   }
 
   void createNewReminder() {
@@ -88,7 +99,6 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         children: [
           Expanded(
-            // Allow ListView to take up remaining space
             child: ListView.builder(
               itemCount: db.reminderList.length,
               itemBuilder: (BuildContext context, index) {
