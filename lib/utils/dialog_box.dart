@@ -30,7 +30,7 @@ class _DialogBoxState extends State<DialogBox> {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: Colors.limeAccent[100],
-      content: Container(
+      content: SizedBox(
         height: 300,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,

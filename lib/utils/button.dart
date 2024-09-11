@@ -4,8 +4,7 @@ class ButtonWidget extends StatelessWidget {
   final VoidCallback onSave;
   final VoidCallback onCancel;
 
-  const ButtonWidget({required this.onSave, required this.onCancel, Key? key})
-      : super(key: key);
+  const ButtonWidget({required this.onSave, required this.onCancel, super.key});
 
   @override
   Widget build(BuildContext context) {

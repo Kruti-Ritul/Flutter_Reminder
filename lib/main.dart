@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:myreminder/pages/home_page.dart';
 import 'package:myreminder/utils/notifications.dart';
@@ -12,7 +11,7 @@ void main() async {
   await Hive.openBox('mybox');
 
   // Initialize notifications
-  await Notifications.initialize();
+  await Notifications.init();
 
   runApp(const MyApp());
 

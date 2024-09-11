@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:myreminder/utils/reminder.dart';
 import 'package:myreminder/pages/home_page.dart';
 import 'package:myreminder/data/database.dart';
@@ -6,127 +8,116 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 
 class Notifications {
-  static final FlutterLocalNotificationsPlugin _notificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  static final FlutterLocalNotificationsPlugin
+      _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  // Initialize notifications Permission
-  static Future<void> initialize() async {
-    const InitializationSettings initializationSettings =
-        InitializationSettings(
-      android: AndroidInitializationSettings('mipmap/ic_launcher'),
+  //Notification plugin initialization
+  static Future init() async {
+    // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    final DarwinInitializationSettings initializationSettingsDarwin =
+        DarwinInitializationSettings(
+      onDidReceiveLocalNotification: (id, title, body, payload) {},
     );
+    final LinuxInitializationSettings initializationSettingsLinux =
+        const LinuxInitializationSettings(
+            defaultActionName: 'Open notification');
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+            android: initializationSettingsAndroid,
+            iOS: initializationSettingsDarwin,
+            linux: initializationSettingsLinux);
+    _flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (details) {},
+    );
+    _flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestNotificationsPermission();
+  }
 
-    await _notificationsPlugin.initialize(initializationSettings);
+  //show a simple notification
+  static Future showSimpleNotification({
+    required String title,
+    required String body,
+    required String payload,
+  }) async {
+    const AndroidNotificationDetails androidNotificationDetails =
+        AndroidNotificationDetails('your channel id', 'your channel name',
+            channelDescription: 'your channel description',
+            importance: Importance.max,
+            priority: Priority.high,
+            ticker: 'ticker');
+    const NotificationDetails notificationDetails =
+        NotificationDetails(android: androidNotificationDetails);
+    await _flutterLocalNotificationsPlugin
+        .show(0, title, body, notificationDetails, payload: payload);
+  }
 
-    if (await _notificationsPlugin
-            .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin>()
-            ?.areNotificationsEnabled() ==
-        false) {
-      await _notificationsPlugin
-          .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
-          ?.requestNotificationsPermission();
+  //Periodic Notification at regular intervals
+  static Future showperiodicNotifications({
+    required String title,
+    required String body,
+    required String payload,
+  }) async {
+    const AndroidNotificationDetails androidNotificationDetails =
+        AndroidNotificationDetails('channel 2', 'your channel name',
+            channelDescription: 'your channel description',
+            importance: Importance.max,
+            priority: Priority.high,
+            ticker: 'ticker');
+    const NotificationDetails notificationDetails =
+        NotificationDetails(android: androidNotificationDetails);
+
+    try {
+      await _flutterLocalNotificationsPlugin.periodicallyShow(
+          1, title, body, RepeatInterval.everyMinute, notificationDetails,
+          payload: payload);
+      print('Periodic notification scheduled successfully');
+    } catch (e) {
+      print('Error scheduling periodic notification: $e');
+    }
+    Future.delayed(Duration(seconds: 5));
+  }
+
+  static Future<void> checkScheduledNotifications() async {
+    final List<PendingNotificationRequest> pendingNotifications =
+        await _flutterLocalNotificationsPlugin.pendingNotificationRequests();
+    print('Pending notifications: ${pendingNotifications.length}');
+    for (var notification in pendingNotifications) {
+      print(
+          'ID: ${notification.id}, Title: ${notification.title}, Body: ${notification.body}');
     }
   }
 
-  Future<void> createNotificationChannel() async {
-    const AndroidNotificationChannel channel = AndroidNotificationChannel(
-      'channel 2', // id
-      'Main Channel', // title
-      description:
-          'This channel is used for important notifications.', // description
-      importance: Importance.max,
-    );
-
-    await _notificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
-  }
-
-  // Show a notification immediately
-  static Future<void> showNotification({
-    required int id,
+  // Schedule a notification every 10 seconds
+  static void startPeriodicNotifications({
     required String title,
     required String body,
-  }) async {
-    const NotificationDetails notificationDetails = NotificationDetails(
-      android: AndroidNotificationDetails(
-        'channel 2', // Channel ID
-        'Main Channel', // Channel name
-        channelDescription: 'Channel for reminders', // Channel description
-        importance: Importance.max,
-        priority: Priority.high,
-        playSound: true, // Play sound on notification
-      ),
-    );
-    //Notifications.showNotification(id: id, title: title, body: body);
-    await _notificationsPlugin.show(
-      id,
-      title,
-      body,
-      notificationDetails,
-    );
-  }
-
-  // Schedule a notification for a future time
-  static Future<void> scheduleNotification({
-    required int id,
-    required String title,
-    required String body,
-    required DateTime scheduledTime,
-  }) async {
-    tz.initializeTimeZones();
-
-    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-
-    // Convert scheduledTime to local time zone
-    final tz.TZDateTime scheduledDate = tz.TZDateTime(
-      tz.local,
-      scheduledTime.year,
-      scheduledTime.month,
-      scheduledTime.day,
-      scheduledTime.hour,
-      scheduledTime.minute,
-    );
-
-    //if (scheduledDate.isBefore(now)) {
-    // If the scheduled time is in the past, don't schedule
-    //print(
-    //  'Cannot schedule notification in the past. Scheduled time: $scheduledDate, current time: $now');
-    //return;
-    // }
-
-    print('Scheduling notification with title: $title, at: $scheduledDate');
-    print(
-        'Notification scheduled for (local time): ${scheduledDate.toLocal()}');
-    print('Notification scheduled for (UTC): ${scheduledDate.toUtc()}');
-
-    const NotificationDetails notificationDetails = NotificationDetails(
-      android: AndroidNotificationDetails(
-        'channel 2', // Channel ID
-        'Main Channel', // Channel name
-        channelDescription: 'Channel for reminders', // Channel description
-        importance: Importance.max,
-        priority: Priority.high,
-        playSound: true, // Play sound on notification
-      ),
-    );
-
-    await _notificationsPlugin.zonedSchedule(
-      2,
-      title,
-      body,
-      scheduledDate,
-      notificationDetails,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.wallClockTime,
-    );
-
-    print(
-        'Notification scheduled for (local time): ${scheduledDate.toLocal()}');
-    print('Notification scheduled for (UTC): ${scheduledDate.toUtc()}');
+    required String payload,
+  }) {
+    Timer.periodic(Duration(seconds: 10), (Timer timer) async {
+      await _flutterLocalNotificationsPlugin.show(
+        0,
+        title,
+        body,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'Main Channel',
+            'your_channel_name',
+            channelDescription: 'your_channel_description',
+            importance: Importance.max,
+            priority: Priority.high,
+            //ticker: 'ticker',
+            playSound: true,
+            enableVibration: true,
+          ),
+        ),
+        payload: payload,
+      );
+      print('Notification scheduled successfully every 10 seconds');
+    });
   }
 }

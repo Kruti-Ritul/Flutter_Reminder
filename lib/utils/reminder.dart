@@ -71,10 +71,10 @@ class Reminder extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 5),
+              const SizedBox(height: 5),
               Text(
                 taskTime,
-                style: TextStyle(
+                style: const TextStyle(
                   fontFamily: 'Ariel',
                   fontSize: 14,
                   color: Colors.black54,

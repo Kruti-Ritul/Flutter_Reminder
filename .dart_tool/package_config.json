@@ -410,6 +410,12 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "rxdart",
+      "rootUri": "file:///C:/Users/Parul/AppData/Local/Pub/Cache/hosted/pub.dev/rxdart-0.28.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "shelf",
       "rootUri": "file:///C:/Users/Parul/AppData/Local/Pub/Cache/hosted/pub.dev/shelf-1.4.1",
       "packageUri": "lib/",
@@ -560,7 +566,7 @@
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2024-09-08T18:24:31.254609Z",
+  "generated": "2024-09-10T18:02:48.820728Z",
   "generator": "pub",
   "generatorVersion": "3.5.0",
   "flutterRoot": "file:///R:/Flutter/flutter",
