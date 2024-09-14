@@ -47,18 +47,20 @@ class _HomePageState extends State<HomePage> {
       String formattedTime = formatTimeOfDay(time);
       db.reminderList.add([task, formattedTime, false]);
 
-      //final now = DateTime.now();
-      //final scheduledTime =
-      //DateTime(now.year, now.month, now.day, time.hour, time.minute);
+      final now = DateTime.now();
+      final scheduledTime =
+          DateTime(now.year, now.month, now.day, time.hour, time.minute);
 
       // Adjust notification scheduling based on whether the time is today or tomorrow
-      //final notificationTime = scheduledTime.isBefore(now)
-      //? scheduledTime.add(const Duration(days: 1))
-      //: scheduledTime;
+      final notificationTime = scheduledTime.isBefore(now)
+          ? scheduledTime.add(const Duration(days: 1))
+          : scheduledTime;
 
-      Notifications.showperiodicNotifications(
-        title: "Periodic",
-        body: 'This is Periodic Notification',
+      Notifications.scheduleNotification(
+        id: db.reminderList.length,
+        title: task,
+        body: 'Reminder to complete daily task',
+        scheduledTime: notificationTime,
         payload: "This is periodic data",
       );
     });

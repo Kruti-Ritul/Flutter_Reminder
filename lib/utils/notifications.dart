@@ -1,9 +1,10 @@
 import 'dart:async';
-
+import 'package:flutter/material.dart';
 import 'package:myreminder/utils/reminder.dart';
 import 'package:myreminder/pages/home_page.dart';
 import 'package:myreminder/data/database.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 
@@ -93,12 +94,14 @@ class Notifications {
   }
 
   // Schedule a notification every 10 seconds
+  static Timer? _notificationTimer;
   static void startPeriodicNotifications({
     required String title,
     required String body,
     required String payload,
   }) {
-    Timer.periodic(Duration(seconds: 10), (Timer timer) async {
+    _notificationTimer =
+        Timer.periodic(Duration(minutes: 1), (Timer timer) async {
       await _flutterLocalNotificationsPlugin.show(
         0,
         title,
@@ -119,5 +122,60 @@ class Notifications {
       );
       print('Notification scheduled successfully every 10 seconds');
     });
+  }
+
+  // close a specific channel notification
+
+  static Future<void> cancel(int id) async {
+    await _flutterLocalNotificationsPlugin.cancel(id);
+    print('Notification with ID $id canceled');
+
+    //cancelling timer to stop future notifications
+    _notificationTimer?.cancel(); //stops the periodic timer
+    _notificationTimer = null; //resets timer object
+  }
+
+  //Cancel all Notification (i will use this in future)
+  static Future cancelAll() async {
+    await _flutterLocalNotificationsPlugin.cancelAll();
+    _notificationTimer?.cancel();
+    _notificationTimer = null;
+  }
+
+  //schedule a local Notification
+  static void scheduleNotification({
+    required int id,
+    required String title,
+    required String body,
+    required DateTime scheduledTime,
+    required String payload,
+  }) async {
+    tz.initializeTimeZones();
+    final tz.TZDateTime tzScheduledTime =
+        tz.TZDateTime.from(scheduledTime, tz.local);
+
+    const AndroidNotificationDetails androidNotificationDetails =
+        AndroidNotificationDetails('your_channel_id', 'your_channel_name',
+            channelDescription: 'your_channel_description',
+            importance: Importance.max,
+            priority: Priority.high,
+            ticker: 'ticker');
+
+    const NotificationDetails notificationDetails =
+        NotificationDetails(android: androidNotificationDetails);
+
+    await _flutterLocalNotificationsPlugin.zonedSchedule(
+      id,
+      title,
+      body,
+      tzScheduledTime,
+      notificationDetails,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      payload: payload,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
+    print('Notifications scheduled for $scheduledTime');
   }
 }

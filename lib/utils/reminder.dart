@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:myreminder/pages/home_page.dart';
+import 'package:myreminder/utils/notifications.dart';
 
 class Reminder extends StatelessWidget {
   const Reminder({
@@ -31,7 +33,10 @@ class Reminder extends StatelessWidget {
           motion: const StretchMotion(),
           children: [
             SlidableAction(
-              onPressed: deleteFunction,
+              onPressed: (context) {
+                deleteFunction?.call(context);
+                Notifications.cancel(0);
+              },
               icon: Icons.delete,
               borderRadius: BorderRadius.circular(15),
             ),
