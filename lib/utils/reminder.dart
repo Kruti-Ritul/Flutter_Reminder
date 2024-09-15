@@ -8,14 +8,18 @@ class Reminder extends StatelessWidget {
     super.key,
     required this.taskName,
     required this.taskTime,
+    required this.taskDate,
     required this.taskCompleted,
+    required this.reminderId,
     required this.onChanged,
     required this.deleteFunction,
   });
 
   final String taskName;
   final String taskTime;
+  final String taskDate;
   final bool taskCompleted;
+  final int reminderId;
   final Function(bool?)? onChanged;
   final Function(BuildContext)? deleteFunction;
 
@@ -35,7 +39,7 @@ class Reminder extends StatelessWidget {
             SlidableAction(
               onPressed: (context) {
                 deleteFunction?.call(context);
-                Notifications.cancel(0);
+                Notifications.cancel(reminderId);
               },
               icon: Icons.delete,
               borderRadius: BorderRadius.circular(15),
@@ -76,14 +80,26 @@ class Reminder extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 5),
-              Text(
-                taskTime,
-                style: const TextStyle(
-                  fontFamily: 'Ariel',
-                  fontSize: 14,
-                  color: Colors.black54,
-                ),
+              Row(
+                children: [
+                  Text(
+                    taskTime,
+                    style: const TextStyle(
+                      fontFamily: 'Ariel',
+                      fontSize: 14,
+                      color: Colors.black54,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    taskDate,
+                    style: const TextStyle(
+                      fontFamily: 'Ariel',
+                      fontSize: 14,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

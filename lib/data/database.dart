@@ -9,8 +9,8 @@ class ReminderDataBase {
   //if app is opended for 1st time ever
   void createInitialData() {
     reminderList = [
-      ['Learn Flutter!', '10:30 AM', false],
-      ['Drink Water!!', '10:30 PM', false],
+      ['Learn Flutter!', '10:30 AM', '9-16-2024', 1, false],
+      ['Drink Water!!', '10:30 PM', '9-17-2024', 2, false],
     ];
   }
 

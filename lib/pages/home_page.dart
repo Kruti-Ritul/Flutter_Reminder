@@ -28,7 +28,7 @@ class _HomePageState extends State<HomePage> {
 
   void checkBoxChanged(int index, bool? value) {
     setState(() {
-      db.reminderList[index][2] = value ?? false;
+      db.reminderList[index][4] = value ?? false;
     });
     db.updateDataBase();
   }
@@ -42,26 +42,33 @@ class _HomePageState extends State<HomePage> {
         : '${formattedTime.hour}:${formattedTime.minute.toString().padLeft(2, '0')} AM';
   }
 
-  void addReminder(String task, TimeOfDay time) {
+  String formatDateTime(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}';
+  }
+
+  void addReminder(String task, TimeOfDay time, DateTime date) {
     setState(() {
       String formattedTime = formatTimeOfDay(time);
-      db.reminderList.add([task, formattedTime, false]);
+      String formattedDate = formatDateTime(date);
+      int notificationId = db.reminderList.length + 1;
+      db.reminderList
+          .add([task, formattedTime, formattedDate, notificationId, false]);
 
       final now = DateTime.now();
       final scheduledTime =
-          DateTime(now.year, now.month, now.day, time.hour, time.minute);
+          DateTime(date.day, date.month, date.year, time.hour, time.minute);
 
       // Adjust notification scheduling based on whether the time is today or tomorrow
       final notificationTime = scheduledTime.isBefore(now)
           ? scheduledTime.add(const Duration(days: 1))
           : scheduledTime;
 
-      Notifications.scheduleNotification(
-        id: db.reminderList.length,
+      Notifications.startPeriodicscheduledNotifications(
+        id: notificationId,
         title: task,
         body: 'Reminder to complete daily task',
-        scheduledTime: notificationTime,
         payload: "This is periodic data",
+        scheduledTime: notificationTime,
       );
     });
 
@@ -74,8 +81,8 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (context) {
         return DialogBox(
-          onSave: (String task, TimeOfDay time) {
-            addReminder(task, time);
+          onSave: (String task, TimeOfDay time, DateTime date) {
+            addReminder(task, time, date);
           },
         );
       },
@@ -108,7 +115,9 @@ class _HomePageState extends State<HomePage> {
                 return Reminder(
                   taskName: db.reminderList[index][0],
                   taskTime: db.reminderList[index][1],
-                  taskCompleted: db.reminderList[index][2],
+                  taskDate: db.reminderList[index][2],
+                  reminderId: db.reminderList[index][3],
+                  taskCompleted: db.reminderList[index][4],
                   onChanged: (value) => checkBoxChanged(index, value),
                   deleteFunction: (context) => deleteReminder(index),
                 );

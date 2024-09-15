@@ -12,6 +12,8 @@ class Notifications {
   static final FlutterLocalNotificationsPlugin
       _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
+  static bool _timeZoneInitialized = false;
+
   //Notification plugin initialization
   static Future init() async {
     // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
@@ -94,7 +96,7 @@ class Notifications {
   }
 
   // Schedule a notification every 10 seconds
-  static Timer? _notificationTimer;
+  //static Timer? _notificationTimer;
   static void startPeriodicNotifications({
     required String title,
     required String body,
@@ -150,16 +152,28 @@ class Notifications {
     required DateTime scheduledTime,
     required String payload,
   }) async {
-    tz.initializeTimeZones();
+    //ensure timezone initialization during start of the app
+    if (!_timeZoneInitialized) {
+      tz.initializeTimeZones();
+      _timeZoneInitialized = true;
+    }
+
     final tz.TZDateTime tzScheduledTime =
         tz.TZDateTime.from(scheduledTime, tz.local);
 
+    const String notificationChannelId = 'my_channel_id';
+
     const AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails('your_channel_id', 'your_channel_name',
-            channelDescription: 'your_channel_description',
-            importance: Importance.max,
-            priority: Priority.high,
-            ticker: 'ticker');
+        AndroidNotificationDetails(
+      notificationChannelId,
+      'my_channel_name',
+      channelDescription: 'your_channel_description',
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'ticker',
+      playSound: true,
+      enableVibration: true,
+    );
 
     const NotificationDetails notificationDetails =
         NotificationDetails(android: androidNotificationDetails);
@@ -177,5 +191,80 @@ class Notifications {
       matchDateTimeComponents: DateTimeComponents.time,
     );
     print('Notifications scheduled for $scheduledTime');
+    print('Notification Channel ID: $notificationChannelId');
+  }
+
+// Another try on scheduled notifications
+
+  static int _secondsUntilNextOccurrence(DateTime scheduledTime) {
+    final now = DateTime.now();
+    DateTime targetTime = DateTime(
+        now.year, now.month, now.day, scheduledTime.hour, scheduledTime.minute);
+
+    // If the scheduled time has already passed today, schedule for tomorrow
+    if (targetTime.isBefore(now)) {
+      targetTime = targetTime.add(Duration(days: 1));
+    }
+
+    return targetTime.difference(now).inSeconds;
+  }
+
+  static Timer? _notificationTimer;
+
+  static void startPeriodicscheduledNotifications({
+    required int id,
+    required String title,
+    required String body,
+    required String payload,
+    required DateTime scheduledTime,
+  }) {
+    final secondsUntilNextOccurrence =
+        _secondsUntilNextOccurrence(scheduledTime);
+
+    // Schedule the first notification
+    Timer(Duration(seconds: secondsUntilNextOccurrence), () async {
+      await _flutterLocalNotificationsPlugin.show(
+        id,
+        title,
+        body,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'Main Channel',
+            'your_channel_name',
+            channelDescription: 'your_channel_description',
+            importance: Importance.max,
+            priority: Priority.high,
+            playSound: true,
+            enableVibration: true,
+          ),
+        ),
+        payload: payload,
+      );
+      print(
+          'Notification scheduled successfully for ${scheduledTime.hour}:${scheduledTime.minute}');
+    });
+
+    // Set up periodic notifications to repeat daily
+    _notificationTimer = Timer.periodic(Duration(days: 1), (Timer timer) async {
+      await _flutterLocalNotificationsPlugin.show(
+        id,
+        title,
+        body,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'Main Channel',
+            'your_channel_name',
+            channelDescription: 'your_channel_description',
+            importance: Importance.max,
+            priority: Priority.high,
+            playSound: true,
+            enableVibration: true,
+          ),
+        ),
+        payload: payload,
+      );
+      print(
+          'Notification scheduled successfully every day at ${scheduledTime.hour}:${scheduledTime.minute}');
+    });
   }
 }

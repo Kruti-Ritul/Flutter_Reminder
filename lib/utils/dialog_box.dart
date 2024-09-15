@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:myreminder/utils/button.dart';
+import 'package:myreminder/utils/notifications.dart';
 
 class DialogBox extends StatefulWidget {
-  final Function(String task, TimeOfDay time) onSave;
+  final Function(String task, TimeOfDay time, DateTime date) onSave;
 
   const DialogBox({super.key, required this.onSave});
 
@@ -12,6 +14,7 @@ class DialogBox extends StatefulWidget {
 
 class _DialogBoxState extends State<DialogBox> {
   final TextEditingController _controller = TextEditingController();
+  DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
 
   void showtimepicker(BuildContext context) async {
@@ -26,12 +29,27 @@ class _DialogBoxState extends State<DialogBox> {
     }
   }
 
+  Future<void> showdatepicker(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (pickedDate != null && pickedDate != _selectedDate) {
+      setState(() {
+        _selectedDate = pickedDate;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: Colors.limeAccent[100],
       content: SizedBox(
-        height: 300,
+        height: 400,
+        width: 350,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -45,6 +63,26 @@ class _DialogBoxState extends State<DialogBox> {
                 ),
               ),
             ),
+
+            const SizedBox(height: 20),
+
+            //Date Picker Button
+            FloatingActionButton.extended(
+              label: const Text("Pick Date"),
+              icon: const Icon(Icons.access_time),
+              onPressed: () {
+                showdatepicker(context);
+              },
+            ),
+
+            const SizedBox(height: 20),
+
+            // Display the selected date if any
+            if (_selectedDate != null)
+              Text(
+                "Selected Date: ${DateFormat.yMd().format(_selectedDate!)}",
+                style: const TextStyle(fontSize: 16),
+              ),
 
             const SizedBox(height: 20),
 
@@ -71,8 +109,11 @@ class _DialogBoxState extends State<DialogBox> {
             // Add ButtonWidget for Save and Cancel
             ButtonWidget(
               onSave: () {
-                if (_controller.text.isNotEmpty && _selectedTime != null) {
-                  widget.onSave(_controller.text, _selectedTime!);
+                if (_controller.text.isNotEmpty &&
+                    _selectedTime != null &&
+                    _selectedDate != null) {
+                  widget.onSave(
+                      _controller.text, _selectedTime!, _selectedDate!);
                   Navigator.of(context).pop();
                 }
               },
