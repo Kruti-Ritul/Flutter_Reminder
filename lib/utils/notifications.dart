@@ -23,9 +23,8 @@ class Notifications {
         DarwinInitializationSettings(
       onDidReceiveLocalNotification: (id, title, body, payload) {},
     );
-    final LinuxInitializationSettings initializationSettingsLinux =
-        const LinuxInitializationSettings(
-            defaultActionName: 'Open notification');
+    const LinuxInitializationSettings initializationSettingsLinux =
+        LinuxInitializationSettings(defaultActionName: 'Open notification');
     final InitializationSettings initializationSettings =
         InitializationSettings(
             android: initializationSettingsAndroid,
@@ -58,7 +57,7 @@ class Notifications {
     await _flutterLocalNotificationsPlugin
         .show(0, title, body, notificationDetails, payload: payload);
   }
-
+/*
   //Periodic Notification at regular intervals
   static Future showperiodicNotifications({
     required String title,
@@ -85,6 +84,8 @@ class Notifications {
     Future.delayed(Duration(seconds: 5));
   }
 
+  */
+
   static Future<void> checkScheduledNotifications() async {
     final List<PendingNotificationRequest> pendingNotifications =
         await _flutterLocalNotificationsPlugin.pendingNotificationRequests();
@@ -94,6 +95,8 @@ class Notifications {
           'ID: ${notification.id}, Title: ${notification.title}, Body: ${notification.body}');
     }
   }
+
+  /*
 
   // Schedule a notification every 10 seconds
   //static Timer? _notificationTimer;
@@ -126,6 +129,8 @@ class Notifications {
     });
   }
 
+*/
+
   // close a specific channel notification
 
   static Future<void> cancel(int id) async {
@@ -144,6 +149,7 @@ class Notifications {
     _notificationTimer = null;
   }
 
+/*
   //schedule a local Notification
   static void scheduleNotification({
     required int id,
@@ -193,6 +199,7 @@ class Notifications {
     print('Notifications scheduled for $scheduledTime');
     print('Notification Channel ID: $notificationChannelId');
   }
+*/
 
 // Another try on scheduled notifications
 

@@ -9,8 +9,8 @@ class Reminder extends StatelessWidget {
     required this.taskName,
     required this.taskTime,
     required this.taskDate,
-    required this.taskCompleted,
     required this.reminderId,
+    required this.taskCompleted,
     required this.onChanged,
     required this.deleteFunction,
   });
@@ -18,8 +18,8 @@ class Reminder extends StatelessWidget {
   final String taskName;
   final String taskTime;
   final String taskDate;
-  final bool taskCompleted;
   final int reminderId;
+  final bool taskCompleted;
   final Function(bool?)? onChanged;
   final Function(BuildContext)? deleteFunction;
 
