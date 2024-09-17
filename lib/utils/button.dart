@@ -14,7 +14,8 @@ class ButtonWidget extends StatelessWidget {
         // Cancel Button
         ElevatedButton(
           onPressed: onCancel,
-          //style: ElevatedButton.styleFrom(primary: Colors.redAccent),
+          style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 238, 247, 255)),
           child: const Text("Cancel"),
         ),
 
@@ -23,7 +24,8 @@ class ButtonWidget extends StatelessWidget {
         // Save Button
         ElevatedButton(
           onPressed: onSave,
-          //style: ElevatedButton.styleFrom(primary: Colors.greenAccent),
+          style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 238, 247, 255)),
           child: const Text("Save"),
         ),
       ],

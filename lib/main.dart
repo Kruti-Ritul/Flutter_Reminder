@@ -14,18 +14,63 @@ void main() async {
   await Notifications.init();
 
   runApp(const MyApp());
-
-  //Notifications.showNotification(id: id, title: title, body: body)
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  // Define theme mode state (light or dark)
+  bool _isDarkTheme = false;
+
+  @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      theme: _isDarkTheme ? darkTheme : lightTheme, // Toggle between themes
+      home: HomePage(
+        onToggleTheme: () {
+          setState(() {
+            _isDarkTheme = !_isDarkTheme;
+          });
+        },
+      ),
     );
   }
 }
+
+// Define light theme
+final ThemeData lightTheme = ThemeData(
+  brightness: Brightness.light, // Ensure brightness matches
+  primarySwatch: Colors.pink,
+  colorScheme: ColorScheme.fromSwatch(
+    brightness: Brightness.light, // Ensure brightness matches
+  ).copyWith(secondary: Colors.pinkAccent),
+  appBarTheme: const AppBarTheme(
+    backgroundColor: Colors.pink,
+    titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
+  ),
+  floatingActionButtonTheme: const FloatingActionButtonThemeData(
+    backgroundColor: Colors.pinkAccent,
+  ),
+);
+
+// Define dark theme
+final ThemeData darkTheme = ThemeData(
+  brightness: Brightness.dark, // Ensure brightness matches
+  primarySwatch: Colors.grey,
+  colorScheme: ColorScheme.fromSwatch(
+    brightness: Brightness.dark, // Ensure brightness matches
+  ).copyWith(secondary: Colors.blueGrey),
+  appBarTheme: const AppBarTheme(
+    backgroundColor: Colors.grey,
+    titleTextStyle: TextStyle(color: Colors.black, fontSize: 20),
+  ),
+  floatingActionButtonTheme: const FloatingActionButtonThemeData(
+    backgroundColor: Color.fromARGB(255, 77, 134, 156),
+  ),
+);

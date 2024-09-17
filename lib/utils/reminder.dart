@@ -51,7 +51,7 @@ class Reminder extends StatelessWidget {
           height: 113.0,
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.blueAccent[100],
+            color: const Color.fromARGB(255, 205, 232, 229),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Column(
@@ -62,8 +62,8 @@ class Reminder extends StatelessWidget {
                   Checkbox(
                     value: taskCompleted,
                     onChanged: onChanged,
-                    checkColor: Colors.black,
-                    activeColor: Colors.limeAccent[100],
+                    checkColor: Colors.white,
+                    activeColor: const Color.fromARGB(255, 77, 134, 156),
                     side: const BorderSide(color: Colors.black),
                   ),
                   Expanded(
@@ -72,9 +72,12 @@ class Reminder extends StatelessWidget {
                       style: TextStyle(
                         fontFamily: 'Ariel',
                         fontSize: 18,
+                        color: Colors.black,
                         decoration: taskCompleted
                             ? TextDecoration.lineThrough
                             : TextDecoration.none,
+                        decorationColor:
+                            taskCompleted ? Colors.black : Colors.transparent,
                       ),
                     ),
                   ),

@@ -46,10 +46,9 @@ class _DialogBoxState extends State<DialogBox> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Colors.limeAccent[100],
+      backgroundColor: const Color.fromARGB(255, 122, 178, 178),
       content: SizedBox(
-        height: 400,
-        width: 350,
+        height: 380,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -68,8 +67,9 @@ class _DialogBoxState extends State<DialogBox> {
 
             //Date Picker Button
             FloatingActionButton.extended(
+              backgroundColor: const Color.fromARGB(255, 205, 232, 229),
               label: const Text("Pick Date"),
-              icon: const Icon(Icons.access_time),
+              icon: const Icon(Icons.calendar_today),
               onPressed: () {
                 showdatepicker(context);
               },
@@ -88,6 +88,7 @@ class _DialogBoxState extends State<DialogBox> {
 
             // Time picker button
             FloatingActionButton.extended(
+              backgroundColor: const Color.fromARGB(255, 205, 232, 229),
               label: const Text("Pick Time"),
               icon: const Icon(Icons.access_time),
               onPressed: () {

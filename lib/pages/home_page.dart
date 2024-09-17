@@ -6,7 +6,10 @@ import 'package:myreminder/utils/notifications.dart';
 import 'package:myreminder/utils/reminder.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final VoidCallback onToggleTheme; //add theme toggle callback
+  const HomePage(
+      {super.key,
+      required this.onToggleTheme}); //fix constructor to accept on toggle theme
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -145,11 +148,21 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Center(
-          child: Text("MY REMINDER"),
-        ),
-        backgroundColor: Colors.limeAccent[100],
-      ),
+          title: const Center(
+            child: Text(
+              "         MY REMINDER",
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+          ),
+          actions: [
+            IconButton(
+              onPressed: widget.onToggleTheme, //use toggle theme button
+              icon: const Icon(Icons.brightness_6),
+            ),
+          ],
+          backgroundColor: const Color.fromARGB(255, 77, 134, 156)),
       body: Column(
         children: [
           Expanded(
@@ -175,6 +188,7 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: createNewReminder,
         child: const Icon(Icons.add),
+        backgroundColor: const Color.fromARGB(255, 205, 232, 229),
       ),
     );
   }
